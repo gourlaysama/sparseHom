@@ -79,8 +79,8 @@ else
             i1= idx;
             ep = 1;
         end
-        if abs(la1 - lambda(end)) < 1e-10
-            la1 = -1;
+        if la1 > lambda(end) - 1e-10
+            la1 = 0;
         end
         
         % 2nd case: u has a new zero component
@@ -89,27 +89,14 @@ else
         den = den\s;
         w = num2./den;
         [la2, i2] = max(w);
-        if abs(la2 - lambda(end)) < 1e-10
-            la2 = -1;
+        if la2 > lambda(end) - 1e-10
+            la2 = 0;
         end
         
         % pick the right case
+        [nlambda, cas] = max([la1 la2]);
         
-        if (la1 >= lambda(end))
-            if (la2 >= lambda(end))
-                nlambda = 0; cas = 1;
-            else
-                nlambda = la2; cas = 2;
-            end
-        else
-            if (la2 >= lambda(end))
-                nlambda = la1; cas = 1;
-            else
-                [nlambda, cas] = max([la1 la2]);
-            end
-        end
-        
-        if abs(nlambda) < 1e-8
+        if abs(nlambda) < 1e-10
             lambda = [lambda, 0];
             
             if di
@@ -181,6 +168,7 @@ if pl && K > 0
     line(xx,tt,'LineStyle','--', 'Color', 'k');
     xlabel('Lambda values');
     ylabel('abs(u(i)) for non-zero components');
+    title('Evolution of non-zero components with lambda')
 end
 
 end
