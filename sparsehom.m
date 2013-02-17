@@ -61,7 +61,7 @@ else
         % 1st case: u has a new non-zero component
         a = pinv(H(:,nz));
         yt = (eye(m)-H(:,nz)*a)*y;
-        d = a'*sign(u(nz));
+        d = a'*s;
         
         num = H(:,z)'*yt;
         den0 = H(:,z)'*d;
