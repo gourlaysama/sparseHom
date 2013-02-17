@@ -44,6 +44,7 @@ lambda = norm(hb,Inf);
 
 if pl
     allu = zeros(n,1);
+    err = norm(y);
 end
 
 if di
@@ -107,6 +108,7 @@ else
             u(z) = zeros(size(z));
             if pl
                 allu = [allu u];
+                err = [err; norm(y - H*u)];
             end
             break;
         end
@@ -120,6 +122,7 @@ else
             u(z) = zeros(size(z));
             u(nz) = num2 - (lambda(end))*den;
             allu = [allu u];
+            err = [err; norm(y - H*u)];
         end
         
         cont = n-k+1 <= K;
@@ -159,6 +162,7 @@ end
 
 if pl && K > 0
     figure;
+    subplot(211);
     
     tt = abs(allu');
     [~,j] = find(sum(tt));
@@ -174,6 +178,15 @@ if pl && K > 0
     xlabel('Lambda values');
     ylabel('abs(u(i)) for non-zero components');
     title('Evolution of non-zero components with lambda')
+    
+    subplot(212);
+    plot(lambda',err);
+    m = max(err);
+    tt = repmat([0; m*1.1],1,length(lambda));
+    line(xx,tt,'LineStyle','--', 'Color', 'k');
+    axis([lambda(end) lambda(1) 0 m*1.1]);
+    xlabel('Lambda values');
+    ylabel('J(u,lambda)');
 end
 
 end
