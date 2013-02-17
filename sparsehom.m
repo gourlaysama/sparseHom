@@ -180,13 +180,14 @@ if pl && K > 0
     title('Evolution of non-zero components with lambda')
     
     subplot(212);
-    plot(lambda',err);
+    plot(lambda',err,'d-', 'LineWidth', 2);
     m = max(err);
     tt = repmat([0; m*1.1],1,length(lambda));
     line(xx,tt,'LineStyle','--', 'Color', 'k');
     axis([lambda(end) lambda(1) 0 m*1.1]);
     xlabel('Lambda values');
-    ylabel('J(u,lambda)');
+    ylabel('norm(y-H*u(lambda))');
+    title('Evolution of norm(y-H*u(lambda)) with lambda');
 end
 
 end
