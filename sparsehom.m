@@ -116,9 +116,9 @@ else
             disp(['New lambda: ',num2str(nlambda)]);
         end
         
-        u(z) = zeros(size(z));
-        u(nz) = num2 - (lambda(end))*den;
         if pl
+            u(z) = zeros(size(z));
+            u(nz) = num2 - (lambda(end))*den;
             allu = [allu u];
         end
         
@@ -146,6 +146,10 @@ else
             end
             
         else
+            if ~pl
+                u(z) = zeros(size(z));
+                u(nz) = num2 - (lambda(end))*den;
+            end
             if di
                 disp(['Reached  ',num2str(K),' non-zero components in u. Exiting']);
             end
