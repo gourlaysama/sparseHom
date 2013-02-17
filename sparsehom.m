@@ -100,7 +100,8 @@ else
             lambda = [lambda, 0];
             
             if di
-                disp('Reached lambda = 0. This is the last sparse solution. Exiting.');
+                disp(['Reached lambda = 0 with ',num2str(n-k),' non-zeros components.']);
+                disp('This is the last sparse solution. Exiting.');
             end
             u(nz) = num2;
             u(z) = zeros(size(z));
