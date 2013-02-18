@@ -32,6 +32,7 @@ pl = display == 2;
 [m, n] = size(H);
 
 % initialisation
+step = 1;
 thy = H'*y;
 hb = abs(thy);
 [~, i] = max(hb); % indice of the first element to become non-nul
@@ -53,6 +54,9 @@ end
 
 if K == 0
     u = zeros(n,1);
+    if di
+        disp('Finished in 0 steps.');
+    end
 else
     if di
         disp(['A component of u became non-zero. Index: ',num2str(i)]);
@@ -107,8 +111,8 @@ else
             lambda = [lambda, 0];
             
             if di
-                disp(['Reached lambda = 0 with ',num2str(n-k),' non-zeros components.']);
-                disp('This is the last sparse solution. Exiting.');
+                disp(['Reached lambda = 0 with ',num2str(n-k),' non-zeros components in u,']);
+                disp(['after ',num2str(step),' iterations. This is the last sparse solution. Exiting.']);
             end
             u(nz) = num2;
             u(z) = zeros(size(z));
@@ -134,6 +138,7 @@ else
         cont = n-k+1 <= K;
         if cont
             % update variables
+            step = step + 1;
             if cas == 1
                 if di
                     disp(['A component of u became non-zero. Index: ',num2str(z(i1))]);
@@ -160,7 +165,8 @@ else
                 u(nz) = num2 - (lambda(end))*den;
             end
             if di
-                disp(['Reached  ',num2str(K),' non-zero components in u. Exiting']);
+                disp(['Reached  ',num2str(K),' non-zero components in u,']);
+                disp(['after  ',num2str(step),' iterations. Exiting.']);
             end
         end
     end
