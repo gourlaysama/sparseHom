@@ -42,7 +42,9 @@ z = 1:n; z(i) = [];
 k = n-1;
 s = sign(thy(i));
 lambda = norm(hb,Inf);
+seye = speye(m);
 
+clear thy hb;
 if pl
     allu = zeros(n,1);
     err = norm(y);
@@ -64,12 +66,14 @@ else
     cont = true;
     while cont
         % 1st case: u has a new non-zero component
-        a = pinv(H(:,nz));
-        yt = (eye(m)-H(:,nz)*a)*y;
+        Hnz = H(:,nz);
+        a = pinv(Hnz);
+        yt = (seye-Hnz*a)*y;
         d = a'*s;
         
-        num = H(:,z)'*yt;
-        den0 = H(:,z)'*d;
+        Hz = H(:,z);
+        num = Hz'*yt;
+        den0 = Hz'*d;
         v = zeros(k,2);
         for j = 1:k
             v(j,1) = num(j)/(1-den0(j));
@@ -93,7 +97,7 @@ else
         
         % 2nd case: u has a new zero component
         num2 = a*y;
-        den = H(:,nz)'*H(:,nz);
+        den = Hnz'*Hnz;
         den = den\s;
         w = num2./den;
         [w, mi] = sort(w,'descend');
@@ -129,7 +133,7 @@ else
         end
         
         if pl
-            u(z) = zeros(size(z));
+            u(z) = zeros(k,1);
             u(nz) = num2 - (lambda(end))*den;
             allu = [allu u];
             err = [err; norm(y - H*u)];
@@ -161,7 +165,7 @@ else
             
         else
             if ~pl
-                u(z) = zeros(size(z));
+                u(z) = zeros(k);
                 u(nz) = num2 - (lambda(end))*den;
             end
             if di
