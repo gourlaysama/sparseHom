@@ -72,7 +72,10 @@ else
             v(j,2) = -num(j)/(1+den0(j));
         end
         v = v(:);
-        [la1, idx] = max(v);
+        [v, mi] = sort(v,'descend');
+        idx = find(v<lambda(end)-1e-10,1,'first');
+        la1 = v(idx);
+        idx = mi(idx);
         if idx > k
             i1 = idx-k;
             ep = -1;
@@ -89,7 +92,10 @@ else
         den = H(:,nz)'*H(:,nz);
         den = den\s;
         w = num2./den;
-        [la2, i2] = max(w);
+        [w, mi] = sort(w,'descend');
+        i2 = find(w<lambda(end)-1e-10,1,'first');
+        la2 = w(i2);
+        i2 = mi(i2);
         if la2 > lambda(end) - 1e-10
             la2 = 0;
         end
