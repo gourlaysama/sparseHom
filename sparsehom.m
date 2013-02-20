@@ -1,9 +1,9 @@
-function [ u, lambda ] = sparsehom( y, H, K, display )
+function [ u, lambda ] = sparsehom( y, H, K, biaised, display )
 %SPARSEHOM Homotopy continuation-based method for sparse signal
 %  representation in overcomplete dictionaries.
 %
 %   [ uout, lambda ] = sparsehom( y, H, K )
-%   [ uout, lambda ] = sparsehom( y, H, K, display )
+%   [ uout, lambda ] = sparsehom( y, H, K, biaised, display )
 %
 % Solves a system y = A*u + b by minimizing ||y - A*u|| + h*norm(u,1)
 % with u sparse.
@@ -12,6 +12,8 @@ function [ u, lambda ] = sparsehom( y, H, K, display )
 % y: data vector
 % H: dictionary matrix
 % K: number of non-zero componentes allowed in u
+% biaised: 0 for unbiaised solution (default)
+%          1 for biaised solution
 % display: 0 = no display (default value)
 %          1 = print various details to the console
 %          2 = full graphic display (slower) + console details
@@ -21,13 +23,15 @@ function [ u, lambda ] = sparsehom( y, H, K, display )
 % lambda: array of successive values of h (in descending order)
 %         until the one that generated uout
 
-if nargin == 3
-    display = 0;
+di = false; pl = false; biais = false;
+
+if nargin == 5
+    di = display >= 1;
+    pl = display == 2;
+    biais = biaised > 0;
+elseif nargin == 4
+    biais = biaised > 0;    
 end
-
-
-di = display >= 1;
-pl = display == 2;
 
 [m, n] = size(H);
 
@@ -119,7 +123,7 @@ else
                 disp(['after ',num2str(step),' iterations. This is the last sparse solution. Exiting.']);
             end
             u(nz) = num2;
-            u(z) = zeros(size(z));
+            u(z) = zeros(k,1);
             if pl
                 allu = [allu u];
                 err = [err; norm(y - H*u)];
@@ -135,6 +139,7 @@ else
         if pl
             u(z) = zeros(k,1);
             u(nz) = num2 - (lambda(end))*den;
+            
             allu = [allu u];
             err = [err; norm(y - H*u)];
         end
@@ -164,9 +169,12 @@ else
             end
             
         else
-            if ~pl
-                u(z) = zeros(k);
+            if biais
+                u(z) = zeros(k,1);
                 u(nz) = num2 - (lambda(end))*den;
+            else
+                u(z) = zeros(k,1);
+                u(nz) = num2;
             end
             if di
                 disp(['Reached  ',num2str(K),' non-zero components in u,']);

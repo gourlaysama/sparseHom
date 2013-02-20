@@ -13,4 +13,4 @@ sigB = sigD / 10^(RSB/20);
 
 y = d + sigB*b;
 
-[u, lambda] = sparsehom(y, A, 10, 2);
+[u, lambda] = sparsehom(y, A, 5, false, 2);
