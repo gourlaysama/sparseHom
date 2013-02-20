@@ -26,8 +26,7 @@ function [ u, lambda ] = sparsehom( y, H, K, biaised, display )
 %
 % Outputs:
 % uout: minimum representation
-% lambda: array of successive values of h (in descending order)
-%         until the one that generated uout
+% lambda: last value of lambda
 
 di = false; pl = false; biais = false;
 
@@ -57,6 +56,7 @@ seye = speye(m);
 clear thy hb;
 if pl
     allu = zeros(n,1);
+    alllambda = lambda;
     err = norm(y);
 end
 
@@ -91,7 +91,7 @@ else
         end
         v = v(:);
         [v, mi] = sort(v,'descend');
-        idx = find(v<lambda(end)-1e-10,1,'first');
+        idx = find(v<lambda-1e-10,1,'first');
         la1 = v(idx);
         idx = mi(idx);
         if idx > k
@@ -101,7 +101,7 @@ else
             i1= idx;
             ep = 1;
         end
-        if la1 > lambda(end) - 1e-10
+        if la1 > lambda - 1e-10
             la1 = 0;
         end
         
@@ -111,10 +111,10 @@ else
         den = den\s;
         w = num2./den;
         [w, mi] = sort(w,'descend');
-        i2 = find(w<lambda(end)-1e-10,1,'first');
+        i2 = find(w<lambda-1e-10,1,'first');
         la2 = w(i2);
         i2 = mi(i2);
-        if la2 > lambda(end) - 1e-10
+        if la2 > lambda - 1e-10
             la2 = 0;
         end
         
@@ -122,7 +122,7 @@ else
         [nlambda, cas] = max([la1 la2]);
         
         if abs(nlambda) < 1e-10
-            lambda = [lambda, 0];
+            lambda = 0;
             
             if di
                 disp(['Reached lambda = 0 with ',num2str(n-k),' non-zeros components in u,']);
@@ -133,11 +133,12 @@ else
             if pl
                 allu = [allu u];
                 err = [err; norm(y - H*u)];
+                alllambda = [alllambda, 0];
             end
             break;
         end
         
-        lambda = [lambda, nlambda];
+        lambda = nlambda;
         if di
             disp(['New lambda: ',num2str(nlambda)]);
         end
@@ -148,6 +149,7 @@ else
             
             allu = [allu u];
             err = [err; norm(y - H*u)];
+            alllambda = [alllambda, lambda];
         end
         
         cont = n-k+1 <= K;
@@ -177,7 +179,7 @@ else
         else
             if biais
                 u(z) = zeros(k,1);
-                u(nz) = num2 - (lambda(end))*den;
+                u(nz) = num2 - lambda*den;
             else
                 u(z) = zeros(k,1);
                 u(nz) = num2;
@@ -199,22 +201,22 @@ if pl && K > 0
     tt = tt(:,j);
     m = max(tt(:));
     na = size(tt,2);
-    xx = repmat(lambda',1,na);
-    axis([lambda(end) lambda(1) 0 m*1.1]);
+    xx = repmat(alllambda',1,na);
+    axis([lambda alllambda(1) 0 m*1.1]);
     line(xx,tt,'Marker', 'd', 'LineWidth', 2);
-    xx = repmat(lambda,2,1);
-    tt = repmat([0; m*1.1],1,length(lambda));
+    xx = repmat(alllambda,2,1);
+    tt = repmat([0; m*1.1],1,length(alllambda));
     line(xx,tt,'LineStyle','--', 'Color', 'k');
     xlabel('Lambda values');
     ylabel('abs(u(i)) for non-zero components');
     title('Evolution of non-zero components with lambda')
     
     subplot(212);
-    plot(lambda',err,'d-', 'LineWidth', 2);
+    plot(alllambda',err,'d-', 'LineWidth', 2);
     m = max(err);
-    tt = repmat([0; m*1.1],1,length(lambda));
+    tt = repmat([0; m*1.1],1,length(alllambda));
     line(xx,tt,'LineStyle','--', 'Color', 'k');
-    axis([lambda(end) lambda(1) 0 m*1.1]);
+    axis([lambda alllambda(1) 0 m*1.1]);
     xlabel('Lambda values');
     ylabel('norm(y-H*u(lambda))');
     title('Evolution of norm(y-H*u(lambda)) with lambda');
