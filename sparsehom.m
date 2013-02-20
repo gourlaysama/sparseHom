@@ -1,3 +1,9 @@
+% Copyright (c) 2012, Antoine Gourlay
+% All rights reserved.
+%
+% This file is distributed under the Simplified BSD License;
+% see the provided LICENSE file.
+
 function [ u, lambda ] = sparsehom( y, H, K, biaised, display )
 %SPARSEHOM Homotopy continuation-based method for sparse signal
 %  representation in overcomplete dictionaries.
