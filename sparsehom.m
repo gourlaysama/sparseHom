@@ -57,7 +57,7 @@ clear thy hb;
 if pl
     allu = zeros(n,1);
     alllambda = lambda;
-    err = norm(y);
+    err = norm(y)^2;
 end
 
 if di
@@ -132,7 +132,7 @@ else
             u(z) = zeros(k,1);
             if pl
                 allu = [allu u];
-                err = [err; norm(y - H*u)];
+                err = [err; norm(y - H*u)^2];
                 alllambda = [alllambda, 0];
             end
             break;
@@ -145,11 +145,13 @@ else
         
         if pl
             u(z) = zeros(k,1);
-            u(nz) = num2 - (lambda(end))*den;
+            u(nz) = num2; % unbiaised u
             
-            allu = [allu u];
-            err = [err; norm(y - H*u)];
+            err = [err; norm(y - H*u)^2];
             alllambda = [alllambda, lambda];
+            
+            u(nz) = u(nz) - (lambda(end))*den; % biaised u
+            allu = [allu u];
         end
         
         cont = n-k+1 <= K;
@@ -195,6 +197,7 @@ end
 if pl && K > 0
     figure;
     subplot(211);
+    alllambda = log10(alllambda);
     
     tt = abs(allu');
     [~,j] = find(sum(tt));
@@ -202,24 +205,30 @@ if pl && K > 0
     m = max(tt(:));
     na = size(tt,2);
     xx = repmat(alllambda',1,na);
-    axis([lambda alllambda(1) 0 m*1.1]);
+    axis([log10(lambda) alllambda(1) 0 m*1.1]);
     line(xx,tt,'Marker', 'd', 'LineWidth', 2);
     xx = repmat(alllambda,2,1);
     tt = repmat([0; m*1.1],1,length(alllambda));
     line(xx,tt,'LineStyle','--', 'Color', 'k');
-    xlabel('Lambda values');
-    ylabel('abs(u(i)) for non-zero components');
-    title('Evolution of non-zero components with lambda')
+    xt = linspace(log10(lambda),alllambda(1),10);
+    set(gca,'XTick',xt);
+    xtl = cellstr(num2str(10.^xt(:),'%.1f'));
+    set(gca,'XTickLabel',xtl);
+    xlabel('Lambda values (log scale)');
+    ylabel('abs(u_i) for non-zero components');
+    title('Evolution of non-zero components with lambda');
     
     subplot(212);
-    plot(alllambda',err,'d-', 'LineWidth', 2);
+    h = plot(alllambda',err,'d-', 'LineWidth', 2);
     m = max(err);
     tt = repmat([0; m*1.1],1,length(alllambda));
     line(xx,tt,'LineStyle','--', 'Color', 'k');
-    axis([lambda alllambda(1) 0 m*1.1]);
-    xlabel('Lambda values');
-    ylabel('norm(y-H*u(lambda))');
-    title('Evolution of norm(y-H*u(lambda)) with lambda');
+    axis([log10(lambda) alllambda(1) 0 m*1.1]);
+    set(gca,'XTick',xt);
+    set(gca,'XTickLabel',xtl);
+    xlabel('Lambda values (log scale)');
+    ylabel('norm(y_{ortho})^2');
+    title('Evolution of norm(y_{ortho})^2 with lambda');
 end
 
 end
