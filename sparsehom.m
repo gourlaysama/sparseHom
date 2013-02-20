@@ -35,13 +35,13 @@ pl = display == 2;
 step = 1;
 thy = H'*y;
 hb = abs(thy);
-[~, i] = max(hb); % indice of the first element to become non-nul
+[lambda, i] = max(hb); % indice of the first element to become non-nul
 nz = i;
 u = zeros(n,1); u(i) = thy(i);
 z = 1:n; z(i) = [];
 k = n-1;
 s = sign(thy(i));
-lambda = norm(hb,Inf);
+
 seye = speye(m);
 
 clear thy hb;
