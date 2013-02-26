@@ -54,7 +54,7 @@ s = sign(thy(i));
 
 seye = speye(m);
 
-clear thy hb;
+clear hb;
 if pl
     allu = zeros(n,1);
     alllambda = lambda;
@@ -74,17 +74,18 @@ else
     if di
         disp(['A component of u became non-zero. Index: ',num2str(i)]);
     end
+    
+    Hz = H(:,z);
+    Hnz = H(:,nz);
+    iPhi = (Hnz'*Hnz)^-1;
+    
     cont = true;
     while cont
         % 1st case: u has a new non-zero component
-        Hnz = H(:,nz);
-        a = pinv(Hnz);
-        yt = (seye-Hnz*a)*y;
-        d = a'*s;
-        
-        Hz = H(:,z);
-        num = Hz'*yt;
-        den0 = Hz'*d;
+        Psit = Hz'*Hnz;
+        thyNz = thy(nz);
+        num = thy(z) - Psit*iPhi*thyNz;
+        den0 = Psit*iPhi*s;
         v = zeros(k,2);
         for j = 1:k
             v(j,1) = num(j)/(1-den0(j));
@@ -107,9 +108,8 @@ else
         end
         
         % 2nd case: u has a new zero component
-        num2 = a*y;
-        den = Hnz'*Hnz;
-        den = den\s;
+        num2 = iPhi*thyNz;
+        den = iPhi*s;
         w = num2./den;
         [w, mi] = sort(w,'descend');
         i2 = find(w<lambda-1e-10,1,'first');
@@ -168,6 +168,17 @@ else
                 nz = [nz, temp];
                 s = [s; ep];
                 k = k-1;
+                
+                % compute the new iPhi (blockwise inversion)
+                a = H(:,temp);
+                D = a'*a;
+                B = Hnz'*a;
+                C = a'*Hnz;
+                nD = (D - C*iPhi*B)^-1;
+                nB = -iPhi*B*nD;
+                nA = iPhi - nB*C*iPhi;
+                nC = -nD*C*iPhi;
+                iPhi = vertcat([nA, nB], [nC, nD]);
             else
                 if di
                     disp(['A component of u became zero again. Index: ',num2str(nz(i2))]);
@@ -177,8 +188,13 @@ else
                 z = [z, temp];
                 s(i2) = [];
                 k = k+1;
+                
+                % compute the new iPhi (direct method... this is sad)
+                Hnz = H(:,nz);
+                iPhi = inv(Hnz'*Hnz);
             end
-            
+            Hnz = H(:,nz);
+            Hz = H(:,z);
         else
             if biais
                 u(z) = zeros(k,1);
