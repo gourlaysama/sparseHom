@@ -205,16 +205,17 @@ if pl && K > 0
     tt = tt(:,j);
     m = max(tt(:));
     na = size(tt,2);
-    xx = repmat(alllambda',1,na);
     if lambda == 0
-        start = alllambda(end-1);
+        start = alllambda(end-1)-abs(alllambda(end-1))/2;
+        alllambda(end) = start;
     else
         start = alllambda(end);
     end
-    axis([start alllambda(1) 0 m*1.1]);
+    xx = repmat(alllambda',1,na);
+    axis([start-1e-6 alllambda(1) 0 m*1.1]);
     line(xx,tt,'Marker', 'd', 'LineWidth', 2);
-    xx = repmat(alllambda,2,1);
-    tt = repmat([0; m*1.1],1,length(alllambda));
+    xx = repmat(alllambda(1:end-1),2,1);
+    tt = repmat([0; m*1.1],1,length(alllambda)-1);
     line(xx,tt,'LineStyle','--', 'Color', 'k');
     xt = linspace(start,alllambda(1),10);
     set(gca,'XTick',xt);
@@ -227,7 +228,7 @@ if pl && K > 0
     subplot(212);
     h = plot(alllambda',err,'d-', 'LineWidth', 2);
     m = max(err);
-    tt = repmat([0; m*1.1],1,length(alllambda));
+    tt = repmat([0; m*1.1],1,length(alllambda)-1);
     line(xx,tt,'LineStyle','--', 'Color', 'k');
     axis([start alllambda(1) 0 m*1.1]);
     set(gca,'XTick',xt);
