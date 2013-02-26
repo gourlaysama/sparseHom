@@ -206,12 +206,17 @@ if pl && K > 0
     m = max(tt(:));
     na = size(tt,2);
     xx = repmat(alllambda',1,na);
-    axis([log10(lambda) alllambda(1) 0 m*1.1]);
+    if lambda == 0
+        start = alllambda(end-1);
+    else
+        start = alllambda(end);
+    end
+    axis([start alllambda(1) 0 m*1.1]);
     line(xx,tt,'Marker', 'd', 'LineWidth', 2);
     xx = repmat(alllambda,2,1);
     tt = repmat([0; m*1.1],1,length(alllambda));
     line(xx,tt,'LineStyle','--', 'Color', 'k');
-    xt = linspace(log10(lambda),alllambda(1),10);
+    xt = linspace(start,alllambda(1),10);
     set(gca,'XTick',xt);
     xtl = cellstr(num2str(10.^xt(:),'%.1f'));
     set(gca,'XTickLabel',xtl);
@@ -224,7 +229,7 @@ if pl && K > 0
     m = max(err);
     tt = repmat([0; m*1.1],1,length(alllambda));
     line(xx,tt,'LineStyle','--', 'Color', 'k');
-    axis([log10(lambda) alllambda(1) 0 m*1.1]);
+    axis([start alllambda(1) 0 m*1.1]);
     set(gca,'XTick',xt);
     set(gca,'XTickLabel',xtl);
     xlabel('Lambda values (log scale)');
