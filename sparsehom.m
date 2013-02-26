@@ -9,6 +9,7 @@ function [ u, lambda ] = sparsehom( y, H, K, biaised, display )
 %  representation in overcomplete dictionaries.
 %
 %   [ uout, lambda ] = sparsehom( y, H, K )
+%   [ uout, lambda ] = sparsehom( y, H, K, biaised )
 %   [ uout, lambda ] = sparsehom( y, H, K, biaised, display )
 %
 % Solves a system y = A*u + b by minimizing ||y - A*u|| + h*norm(u,1)
