@@ -1,4 +1,4 @@
-clear all; close all;
+clear variables; close all;
 
 rng(12);
 A = 2*rand(5,15)-1;
