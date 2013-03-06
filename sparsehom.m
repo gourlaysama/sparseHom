@@ -39,7 +39,7 @@ elseif nargin == 4
     biais = biaised > 0;    
 end
 
-[m, n] = size(H);
+[~, n] = size(H);
 
 % initialisation
 step = 1;
@@ -51,8 +51,6 @@ u = zeros(n,1); u(i) = thy(i);
 z = 1:n; z(i) = [];
 k = n-1;
 s = sign(thy(i));
-
-seye = speye(m);
 
 clear hb;
 if pl
